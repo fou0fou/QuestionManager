@@ -11,11 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Manager implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String name;
+    private String username;
+
+    private String phoneNum;
+
+    private String password;
+
+    private Integer status;
+
 }

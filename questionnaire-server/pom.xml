@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.foufou</groupId>
-        <artifactId>questionManager</artifactId>
+        <artifactId>Questionnaire</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>questionManager-server</artifactId>
+    <artifactId>questionnaire-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>questionManager-server</name>
     <description>questionManager-server</description>
@@ -18,13 +18,13 @@
 
         <dependency>
             <groupId>com.foufou</groupId>
-            <artifactId>questionManager-common</artifactId>
+            <artifactId>questionnaire-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.foufou</groupId>
-            <artifactId>questionManager-pojo</artifactId>
+            <artifactId>questionnaire-pojo</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

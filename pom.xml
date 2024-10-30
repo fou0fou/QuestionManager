@@ -9,15 +9,15 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.foufou</groupId>
-	<artifactId>questionManager</artifactId>
+	<artifactId>Questionnaire</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>questionManager</name>
 	<description>questionManager</description>
 	<modules>
-		<module>questionManager-pojo</module>
-		<module>questionManager-common</module>
-		<module>questionManager-server</module>
+		<module>questionnaire-pojo</module>
+		<module>questionnaire-common</module>
+		<module>questionnaire-server</module>
 	</modules>
 	<properties>
 		<mybatis.spring>2.2.0</mybatis.spring>
