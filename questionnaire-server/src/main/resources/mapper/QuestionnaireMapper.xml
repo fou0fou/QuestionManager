@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.foufou.mapper.QuestionnaireMapper">
+
+    <insert id="insertPaper">
+        insert into questionnaire(user_id, create_time, update_time, start_time, end_time, status, fill_count,
+                                  description, title)
+            VALUE (#{userId}, #{createTime}, #{updateTime}, #{startTime}, #{endTime}, #{status}, #{fillCount},
+                   #{description}, #{title})
+    </insert>
+
+    <update id="updateQuestionnaire">
+        update questionnaire
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime= null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="title != null">title = #{title},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="list" resultType="com.foufou.vo.QuestionnaireVO">
+        select id, create_time, update_time, start_time, end_time, status, fill_count, description, title
+        from questionnaire
+        <where>
+            <if test="title != null and title != ''">
+                name like concat('%',#{title},'%')
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

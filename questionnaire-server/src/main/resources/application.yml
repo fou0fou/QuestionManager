@@ -21,7 +21,7 @@ spring:
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.sky.entity
+  type-aliases-package: com.foufou.entity
   configuration:
     #开启驼峰命名
     map-underscore-to-camel-case: true
@@ -36,7 +36,7 @@ logging:
         controller: info
 
 
-sky:
+questionnaire:
   jwt:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: mtwm

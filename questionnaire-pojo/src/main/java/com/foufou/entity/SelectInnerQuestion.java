@@ -1,24 +1,26 @@
 package com.foufou.entity;
 
+import com.foufou.enumeration.SelectType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.io.Serializable;
+import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class User implements Serializable {
-
+public class SelectInnerQuestion implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private String username;
+    private Long questionId;
 
-    private String password;
+    private String questionDetails;
 
 }

@@ -1,22 +1,18 @@
-package com.foufou.entity;
+package com.foufou.vo;
 
+import com.foufou.dto.SelectQuestionDTO;
+import com.foufou.dto.TextQuestionDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Questionnaire implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class QuestionnaireDetailVO {
     private Long id;
 
     private Long userId;
@@ -33,9 +29,11 @@ public class Questionnaire implements Serializable {
 
     private Integer status;
 
-    //填写次数
     private Integer fillCount;
 
-    //内容介绍
     private String description;
+
+    private List<SelectQuestionDTO> selectQuestionList;
+
+    private List<TextQuestionDTO> textQuestionList;
 }

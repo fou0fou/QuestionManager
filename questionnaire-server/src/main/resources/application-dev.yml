@@ -3,7 +3,7 @@ sky:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
     port: 3306
-    database: question_manager
+    database: questionnaire
     username: root
     password: 68942569
   alioss:

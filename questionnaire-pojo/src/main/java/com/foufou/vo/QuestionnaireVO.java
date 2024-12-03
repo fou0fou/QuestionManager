@@ -1,27 +1,16 @@
-package com.foufou.entity;
+package com.foufou.vo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Questionnaire implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class QuestionnaireVO {
     private Long id;
-
-    private Long userId;
-
-    private String title;
 
     private LocalDateTime createTime;
 
@@ -33,9 +22,9 @@ public class Questionnaire implements Serializable {
 
     private Integer status;
 
-    //填写次数
     private Integer fillCount;
 
-    //内容介绍
     private String description;
+
+    private String title;
 }
