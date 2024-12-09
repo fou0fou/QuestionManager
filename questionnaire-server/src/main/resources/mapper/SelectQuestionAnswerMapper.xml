@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.foufou.mapper.SelectQuestionAnswerMapper">
+    <insert id="addAnswer">
+        insert into select_answer(select_id, questionnaire_id, stu_name, content, select_inner_id)
+            VALUE(#{selectId}, #{questionnaireId}, #{stuName}, #{content}, #{selectInnerId})
+    </insert>
+
+
+    <delete id="deleteAnswerByInnerQuestionId">
+        delete
+        from select_answer
+        where select_inner_id in
+        <foreach collection="selectInnerQuestionIds" item="selectId" separator="," open="(" close=")">
+            #{selectId}
+        </foreach>
+    </delete>
+</mapper>

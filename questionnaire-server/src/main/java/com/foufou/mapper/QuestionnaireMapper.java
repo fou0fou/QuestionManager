@@ -29,13 +29,7 @@ public interface QuestionnaireMapper {
     @Select("select text_id from questionnaire_text where questionnaire_id = #{id}")
     List<Long> selectByQuestionnaireId02(Long id);
 
-    // 根据问卷id删除选择题答案
-    @Delete("delete from select_answer where questionnaire_id = #{id}")
-    void deleteSelectAnswerByQuestionnaireId(Long id);
 
-    // 根据问卷id删除填空题答案
-    @Delete("delete from text_answer where questionnaire_id = #{id}")
-    void deleteTextAnswerByQuestionnaireId(Long id);
 
     // 根据问卷id删除问卷-选择联合表数据
     @Delete("delete from questionnaire_select where questionnaire_id = #{id}")

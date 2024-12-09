@@ -7,10 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SelectInnerQuestionDTO {
-
+public class TableQuestionDTO {
     private Long id;
 
-    private String questionDetails;
+    private String questionTitle;
 
+    private Long tableId;
+
+    private String col;
+
+    private String line;
 }

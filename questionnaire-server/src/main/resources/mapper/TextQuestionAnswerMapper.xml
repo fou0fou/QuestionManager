@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.foufou.mapper.TextQuestionAnswerMapper">
+
+
+    <insert id="addTextAnswer">
+        insert into text_answer (text_id, questionnaire_id, stu_name, content)
+            VALUE(#{textId}, #{questionnaireId}, #{stuName}, #{content})
+    </insert>
+    <insert id="addTableAnswer">
+        insert into text_answer (text_id, questionnaire_id, stu_name, content, table_id)
+            VALUE(#{textId}, #{questionnaireId}, #{stuName}, #{content}, #{tableId})
+    </insert>
+</mapper>

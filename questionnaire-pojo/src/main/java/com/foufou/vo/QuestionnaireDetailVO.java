@@ -33,7 +33,7 @@ public class QuestionnaireDetailVO {
 
     private String description;
 
-    private List<SelectQuestionDTO> selectQuestionList;
+    private List<SelectQuestionVO> selectQuestionList;
 
-    private List<TextQuestionDTO> textQuestionList;
+    private List<TextQuestionVO> textQuestionList;
 }

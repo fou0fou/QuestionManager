@@ -2,6 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.foufou.mapper.SelectQuestionMapper">
+    <insert id="insertQuestion" useGeneratedKeys="true" keyProperty="id">
+        insert into select_question(question_title, select_type) VALUE (null, null)
+    </insert>
+    <insert id="insertOption">
+        insert into `option`(question_id, sequence, content)
+            VALUE (#{questionId},#{sequence},#{content})
+    </insert>
+    <insert id="insertSelectInnerQuestion" useGeneratedKeys="true" keyProperty="id">
+        insert into select_inner_question(question_id, question_details) VALUE (#{questionId}, #{questionDetails})
+    </insert>
+
+    <update id="updateSelectQuestion">
+        update select_question
+        <set>
+            <if test="questionTitle != null">question_title = #{questionTitle},</if>
+            <if test="selectType != null">select_type = #{selectType}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateSelectInnerQuestion">
+        update select_inner_question
+        <set>
+            <if test="questionDetails != null">question_details = #{questionDetails}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateOption">
+        update `option`
+        <set>
+            <if test="content != null">content = #{content}</if>
+        </set>
+        where question_id = #{questionId} and sequence = #{sequence}
+    </update>
 
     <select id="selectInnerQuestionIdBySelectQuestionIds" resultType="java.lang.Long">
         select id
@@ -30,11 +65,27 @@
         </foreach>
     </delete>
 
-    <delete id="deleteOperationById">
+    <delete id="deleteOptionById">
         delete
         from `option`
         where question_id in
         <foreach collection="selectQuestionIds" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteExtraOption">
+        delete
+        from `option`
+        where question_id = #{id} and sequence not in
+        <foreach collection="alreadyExistOptionSequences" separator="," item="sequence" open="(" close=")">
+            #{sequence}
+        </foreach>
+    </delete>
+    <delete id="deleteExtraInnerQuestions">
+        delete
+        from select_inner_question
+        where question_id = #{questionId} and id not in
+        <foreach collection="selectInnerQuestionIds" separator="," item="id" open="(" close=")">
             #{id}
         </foreach>
     </delete>

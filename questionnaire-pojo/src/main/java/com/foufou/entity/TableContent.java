@@ -11,18 +11,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TextAnswer implements Serializable {
+public class TableContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    private Long textId;
+    private Long questionId;
 
-    private Long questionnaireId;
+    private String col;
 
-    private Long tableId;
-
-    private String stuName;
-
-    private String content;
+    private String line;
 }

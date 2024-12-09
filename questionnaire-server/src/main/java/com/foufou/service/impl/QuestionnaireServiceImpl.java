@@ -2,13 +2,13 @@ package com.foufou.service.impl;
 
 import com.foufou.dto.*;
 import com.foufou.entity.*;
-import com.foufou.mapper.QuestionnaireMapper;
-import com.foufou.mapper.SelectQuestionMapper;
-import com.foufou.mapper.TextQuestionMapper;
+import com.foufou.mapper.*;
 import com.foufou.results.PageResult;
 import com.foufou.service.QuestionnaireService;
 import com.foufou.vo.QuestionnaireDetailVO;
 import com.foufou.vo.QuestionnaireVO;
+import com.foufou.vo.SelectQuestionVO;
+import com.foufou.vo.TextQuestionVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,10 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     private TextQuestionMapper textQuestionMapper;
     @Autowired
     private SelectQuestionMapper selectQuestionMapper;
+    @Autowired
+    private SelectQuestionAnswerMapper selectQuestionAnswerMapper;
+    @Autowired
+    private TextQuestionAnswerMapper textQuestionAnswerMapper;
 
     @Override
     public void createPaper(QuestionnaireDTO questionnaireDTO) {
@@ -48,7 +52,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             List<Long> selectInnerQuestionIds = selectQuestionMapper.selectInnerQuestionIdBySelectQuestionIds(selectQuestionIds);
 
             // 根据问卷id删除选择答案(在这里删除答案是因为里面的问题字段与innerQuestion关联)
-            questionnaireMapper.deleteSelectAnswerByQuestionnaireId(id);
+            selectQuestionAnswerMapper.deleteSelectAnswerByQuestionnaireId(id);
 
             // 删内部嵌套的选择题
             if (!selectInnerQuestionIds.isEmpty()) {
@@ -59,7 +63,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         List<Long> textQuestionIds = questionnaireMapper.selectByQuestionnaireId02(id);
 
         // 根据问卷id删除填空答案
-        questionnaireMapper.deleteTextAnswerByQuestionnaireId(id);
+        textQuestionAnswerMapper.deleteTextAnswerByQuestionnaireId(id);
 
         // 先根据问卷id删问卷-问题关联表
         questionnaireMapper.deleteQuestionnaireJoinSelectQuestionByQuestionnaireId(id);
@@ -67,12 +71,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
         // 删选项和大选择题
         if (!selectQuestionIds.isEmpty()) {
-            selectQuestionMapper.deleteOperationById(selectQuestionIds);
+            selectQuestionMapper.deleteOptionById(selectQuestionIds);
             selectQuestionMapper.deleteSelectQuestionById(selectQuestionIds);
         }
 
         // 再删填空题
         if (!textQuestionIds.isEmpty()) {
+            textQuestionMapper.deleteTableDataByQuestionId(textQuestionIds);
             textQuestionMapper.deleteTextQuestionById(textQuestionIds);
         }
 
@@ -132,18 +137,27 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         if (!textQuestionIds.isEmpty()) {
             // 根据填空题id获取填空题信息
             List<TextQuestion> textQuestionList = textQuestionMapper.selectByQuestionIds(textQuestionIds);
-            List<TextQuestionDTO> textQuestionDTOList = new ArrayList<>();
+            List<TextQuestionVO> textQuestionVOList = new ArrayList<>();
             textQuestionList.forEach(textQuestion -> {
-                textQuestionDTOList.add(new TextQuestionDTO(
-                        textQuestion.getId(),
-                        textQuestion.getQuestionTitle(),
-                        textQuestion.getTableId(),
-                        textQuestion.getCol(),
-                        textQuestion.getLine()));
-            });
+                TextQuestionVO textQuestionVO = new TextQuestionVO();
+                BeanUtils.copyProperties(textQuestion, textQuestionVO);
 
+                // 先要通过填空题id查找是否在TableContent表中存在关联的数据
+                List<TableContentDTO> tableContentDTOList = textQuestionMapper.selectTableDataByQuestionId(textQuestion.getId());
+                if (!tableContentDTOList.isEmpty()) {
+                    textQuestionVO.setTableContentDTOList(tableContentDTOList);
+                } else {
+                    textQuestionVO.setTableContentDTOList(null);
+                }
+
+                // 查找seqNum
+                Integer seqNum = textQuestionMapper.getSeqNumByQuestionnaireIdAndQuestionId(id, textQuestion.getId());
+                textQuestionVO.setSeqNum(seqNum);
+
+                textQuestionVOList.add(textQuestionVO);
+            });
             // 设置填空类信息
-            questionnaireDetailVO.setTextQuestionList(textQuestionDTOList);
+            questionnaireDetailVO.setTextQuestionList(textQuestionVOList);
         } else {
             questionnaireDetailVO.setTextQuestionList(null);
         }
@@ -153,14 +167,17 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         List<Long> selectQuestionIds = questionnaireMapper.selectByQuestionnaireId01(id);
         if (!selectQuestionIds.isEmpty()) {
             // 存储选择题信息
-            List<SelectQuestionDTO> selectQuestionList = new ArrayList<>();
+            List<SelectQuestionVO> selectQuestionList = new ArrayList<>();
             // 对每一个id操作
             selectQuestionIds.forEach(selectQuestionId -> {
 
-                SelectQuestionDTO selectQuestionDTO = new SelectQuestionDTO();
+                SelectQuestionVO selectQuestionVO = new SelectQuestionVO();
 
                 // 根据id查询大选择题的title和selectType
                 SelectQuestion selectQuestion = selectQuestionMapper.selectQuestionById(selectQuestionId);
+
+                // 根据id和选择题id在关联表中查找seqNum
+                Integer seqNum = selectQuestionMapper.getSeqNumByQuestionnaireIdAndQuestionId(id, selectQuestionId);
 
                 // 根据id查询内部嵌套的选择题信息
                 List<SelectInnerQuestion> selectInnerQuestions = selectQuestionMapper.selectInnerQuestionBySelectQuestionId(selectQuestionId);
@@ -184,11 +201,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
                 });
 
                 // 将查询到的信息总和到一个selectQuestion，并add到一个List中
-                BeanUtils.copyProperties(selectQuestion, selectQuestionDTO);
-                selectQuestionDTO.setSelectInnerQuestionDTOList(selectInnerQuestionDTOList);
-                selectQuestionDTO.setOptionDTOList(optionDTOList);
+                BeanUtils.copyProperties(selectQuestion, selectQuestionVO);
+                selectQuestionVO.setTitle(selectQuestion.getQuestionTitle());
+                selectQuestionVO.setSeqNum(seqNum);
+                selectQuestionVO.setSelectInnerQuestionDTOList(selectInnerQuestionDTOList);
+                selectQuestionVO.setOptionDTOList(optionDTOList);
 
-                selectQuestionList.add(selectQuestionDTO);
+                selectQuestionList.add(selectQuestionVO);
             });
 
             // 设置选择类信息

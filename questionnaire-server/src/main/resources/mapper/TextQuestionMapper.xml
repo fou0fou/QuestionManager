@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.foufou.mapper.TextQuestionMapper">
+    <insert id="insertQuestion" useGeneratedKeys="true" keyProperty="id">
+        insert into text_question(question_title) VALUE (null)
+    </insert>
+    <insert id="insertTableContent" useGeneratedKeys="true" keyProperty="id">
+        insert into table_content(question_id, col, line) VALUE (#{questionId}, #{col}, #{line})
+    </insert>
+
+    <update id="updateQuestion">
+        update text_question
+        <set>
+            <if test="questionTitle != null">question_title = #{questionTitle},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateTableContent">
+        update table_content
+        <set>
+            <if test="col != null">col = #{col},</if>
+            <if test="line != null">line = #{line}</if>
+        </set>
+        where id = #{id} and question_id = #{questionId}
+    </update>
 
     <delete id="deleteTextQuestionById">
         delete
@@ -11,9 +33,26 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteTableDataByQuestionId">
+        delete
+        from table_content
+        where question_id in
+        <foreach collection="textQuestionIds" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+
+    </delete>
+    <delete id="deleteTableDataByIdAndQuestionId">
+        delete
+        from table_content
+        where question_id = #{questionId} and id not in
+        <foreach collection="tableIds" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="selectByQuestionIds" resultType="com.foufou.entity.TextQuestion">
-        select id, question_title, col, line, table_id
+        select id, question_title
         from text_question
         where id in
         <foreach collection="textQuestionIds" item="id" separator="," open="(" close=")">

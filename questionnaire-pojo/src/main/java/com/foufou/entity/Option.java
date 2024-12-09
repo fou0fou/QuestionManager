@@ -15,4 +15,5 @@ public class Option implements Serializable {
     private Integer sequence;  //在这个问题中是第几个选项
 
     private String content;
+
 }
