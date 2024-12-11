@@ -5,34 +5,38 @@
 
     <insert id="insertPaper">
         insert into questionnaire(user_id, create_time, update_time, start_time, end_time, status, fill_count,
-                                  description, title)
+                                  description, title, major, grade)
             VALUE (#{userId}, #{createTime}, #{updateTime}, #{startTime}, #{endTime}, #{status}, #{fillCount},
-                   #{description}, #{title})
+                   #{description}, #{title}, #{major}, #{grade})
     </insert>
 
     <update id="updateQuestionnaire">
         update questionnaire
         <set>
             <if test="userId != null">user_id = #{userId},</if>
+            <if test="major != null">major = #{major},</if>
+            <if test="grade != null">grade = #{grade},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="startTime != null">start_time = #{startTime},</if>
             <if test="endTime= null">end_time = #{endTime},</if>
             <if test="status != null">status = #{status},</if>
             <if test="description != null">description = #{description},</if>
             <if test="title != null">title = #{title},</if>
+            <if test="major != null">major = #{major}</if>
+            <if test="grade != null">grade = #{grade}</if>
         </set>
         where id = #{id}
     </update>
 
     <select id="list" resultType="com.foufou.vo.QuestionnaireVO">
-        select id, create_time, update_time, start_time, end_time, status, fill_count, description, title
+        select id, major, grade, create_time, update_time, start_time, end_time, status, fill_count, description, title
         from questionnaire
         <where>
             <if test="title != null and title != ''">
-                name like concat('%',#{title},'%')
+                and title like concat('%',#{title},'%')
             </if>
-            <if test="userId != null and userId != ''">
-                user_id = #{userId}
+            <if test="userId != null">
+                and user_id = #{userId}
             </if>
         </where>
     </select>

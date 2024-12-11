@@ -1,14 +1,14 @@
 package com.foufou.service.impl;
 
+import com.foufou.constant.MessageConstant;
 import com.foufou.dto.*;
 import com.foufou.entity.*;
+import com.foufou.exception.QuestionnaireNotFoundException;
+import com.foufou.exception.QuestionnaireOutOfDate;
 import com.foufou.mapper.*;
 import com.foufou.results.PageResult;
 import com.foufou.service.QuestionnaireService;
-import com.foufou.vo.QuestionnaireDetailVO;
-import com.foufou.vo.QuestionnaireVO;
-import com.foufou.vo.SelectQuestionVO;
-import com.foufou.vo.TextQuestionVO;
+import com.foufou.vo.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -107,17 +108,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     @Override
     public QuestionnaireVO getPaper(Long id) {
         Questionnaire questionnaire = questionnaireMapper.getPaperById(id);
-        return new QuestionnaireVO(
-                id,
-                questionnaire.getCreateTime(),
-                questionnaire.getUpdateTime(),
-                questionnaire.getStartTime(),
-                questionnaire.getEndTime(),
-                questionnaire.getStatus(),
-                questionnaire.getFillCount(),
-                questionnaire.getDescription(),
-                questionnaire.getTitle()
-        );
+        QuestionnaireVO questionnaireVO = new QuestionnaireVO();
+        BeanUtils.copyProperties(questionnaire, questionnaireVO);
+        return questionnaireVO;
     }
 
     @Override
@@ -217,5 +210,118 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
         }
 
         return questionnaireDetailVO;
+    }
+
+    @Override
+    public StuQuestionnaireDetailVO getPaperToStu(Integer grade, String major) {
+        StuQuestionnaireDetailVO stuQuestionnaireDetailVO = new StuQuestionnaireDetailVO();
+
+        // 先通过年级和专业获取问卷信息
+        Questionnaire questionnaire = questionnaireMapper.getPaperByGradeAndMajor(grade, major);
+
+        // 如果为空，抛出异常返回
+        if (null == questionnaire) {
+            throw new QuestionnaireNotFoundException(MessageConstant.QUESTIONNAIRE_NOT_FOUND);
+        }
+
+        // 判断问卷是否可填的状态
+        if (questionnaire.getEndTime().isBefore(LocalDateTime.now()) || questionnaire.getStatus() == 0) {
+            if (questionnaire.getStatus() == 0) {
+                questionnaireMapper.updateStatus(questionnaire.getId(), 0);
+            }
+            throw new QuestionnaireOutOfDate(MessageConstant.QUESTIONNAIRE_CAN_NOT_ADD_ANSWER);
+        }
+
+        BeanUtils.copyProperties(questionnaire, stuQuestionnaireDetailVO);
+
+        // 获取问卷填空题的信息
+        // 先在关联表中获得与问卷id关联的填空题id
+
+        Long id = questionnaire.getId();
+
+        List<Long> textQuestionIds = questionnaireMapper.selectByQuestionnaireId02(id);
+        if (!textQuestionIds.isEmpty()) {
+            // 根据填空题id获取填空题信息
+            List<TextQuestion> textQuestionList = textQuestionMapper.selectByQuestionIds(textQuestionIds);
+            List<TextQuestionVO> textQuestionVOList = new ArrayList<>();
+            textQuestionList.forEach(textQuestion -> {
+                TextQuestionVO textQuestionVO = new TextQuestionVO();
+                BeanUtils.copyProperties(textQuestion, textQuestionVO);
+
+                // 先要通过填空题id查找是否在TableContent表中存在关联的数据
+                List<TableContentDTO> tableContentDTOList = textQuestionMapper.selectTableDataByQuestionId(textQuestion.getId());
+                if (!tableContentDTOList.isEmpty()) {
+                    textQuestionVO.setTableContentDTOList(tableContentDTOList);
+                } else {
+                    textQuestionVO.setTableContentDTOList(null);
+                }
+
+                // 查找seqNum
+                Integer seqNum = textQuestionMapper.getSeqNumByQuestionnaireIdAndQuestionId(id, textQuestion.getId());
+                textQuestionVO.setSeqNum(seqNum);
+
+                textQuestionVOList.add(textQuestionVO);
+            });
+            // 设置填空类信息
+            stuQuestionnaireDetailVO.setTextQuestionList(textQuestionVOList);
+        } else {
+            stuQuestionnaireDetailVO.setTextQuestionList(null);
+        }
+
+        // 获取问卷选择题信息
+        // 先在关联表中获得与问卷id关联的选择题id
+        List<Long> selectQuestionIds = questionnaireMapper.selectByQuestionnaireId01(id);
+        if (!selectQuestionIds.isEmpty()) {
+            // 存储选择题信息
+            List<SelectQuestionVO> selectQuestionList = new ArrayList<>();
+            // 对每一个id操作
+            selectQuestionIds.forEach(selectQuestionId -> {
+
+                SelectQuestionVO selectQuestionVO = new SelectQuestionVO();
+
+                // 根据id查询大选择题的title和selectType
+                SelectQuestion selectQuestion = selectQuestionMapper.selectQuestionById(selectQuestionId);
+
+                // 根据id和选择题id在关联表中查找seqNum
+                Integer seqNum = selectQuestionMapper.getSeqNumByQuestionnaireIdAndQuestionId(id, selectQuestionId);
+
+                // 根据id查询内部嵌套的选择题信息
+                List<SelectInnerQuestion> selectInnerQuestions = selectQuestionMapper.selectInnerQuestionBySelectQuestionId(selectQuestionId);
+                List<SelectInnerQuestionDTO> selectInnerQuestionDTOList;
+                if (!selectInnerQuestions.isEmpty()) {
+                    selectInnerQuestionDTOList = new ArrayList<>();
+                    selectInnerQuestions.forEach(selectInnerQuestion -> {
+                        selectInnerQuestionDTOList.add(new SelectInnerQuestionDTO(
+                                selectInnerQuestion.getId(),
+                                selectInnerQuestion.getQuestionDetails()));
+                    });
+                } else {        // 没有内部嵌套选择题
+                    selectInnerQuestionDTOList =  null;
+                }
+
+                // 根据id查询选项
+                List<Option> options = selectQuestionMapper.selectOptionsByQuestionId(selectQuestionId);
+                List<OptionDTO> optionDTOList = new ArrayList<>();
+                options.forEach(option -> {
+                    optionDTOList.add(new OptionDTO(option.getSequence(), option.getContent()));
+                });
+
+                // 将查询到的信息总和到一个selectQuestion，并add到一个List中
+                BeanUtils.copyProperties(selectQuestion, selectQuestionVO);
+                selectQuestionVO.setTitle(selectQuestion.getQuestionTitle());
+                selectQuestionVO.setSeqNum(seqNum);
+                selectQuestionVO.setSelectInnerQuestionDTOList(selectInnerQuestionDTOList);
+                selectQuestionVO.setOptionDTOList(optionDTOList);
+
+                selectQuestionList.add(selectQuestionVO);
+            });
+
+            // 设置选择类信息
+            stuQuestionnaireDetailVO.setSelectQuestionList(selectQuestionList);
+        } else {
+            stuQuestionnaireDetailVO.setSelectQuestionList(null);
+        }
+
+        return stuQuestionnaireDetailVO;
     }
 }

@@ -2,6 +2,7 @@ package com.foufou.mapper;
 
 import com.foufou.dto.TableContentDTO;
 import com.foufou.entity.TableContent;
+import com.foufou.entity.TextJointData;
 import com.foufou.entity.TextQuestion;
 import org.apache.ibatis.annotations.*;
 
@@ -26,7 +27,7 @@ public interface TextQuestionMapper {
     void updateQuestion(TextQuestion textQuestion);
 
     // 根据填空题id在table_content表中查找关联数据
-    @Select("select * from table_content where question_id = #{id}")
+    @Select("select id, col, line from table_content where question_id = #{id}")
     List<TableContentDTO> selectTableDataByQuestionId(Long id);
 
     // 根据填空题id删除表数据
@@ -52,7 +53,7 @@ public interface TextQuestionMapper {
     void addQuestionSeq(Long questionnaireId, Integer seqNum);
 
     // 查找表数据
-    @Select("select * from table_content where id = #{id} and question_id = #{questionId}")
+//    @Select("select * from table_content where id = #{id} and question_id = #{questionId}")
     TableContent selectTableDataById(Long id, Long questionId);
 
     // 更新表
@@ -60,4 +61,8 @@ public interface TextQuestionMapper {
 
     // 更新时删除多余表数据
     void deleteTableDataByIdAndQuestionId(Long questionId, List<Long> tableIds);
+
+    // 根据问卷id获取text关联表数据
+    @Select("select text_id, seq_num from questionnaire_text where questionnaire_id = #{id}")
+    List<TextJointData> getIdAndSeqNumByQuestionnaireId(Long id);
 }

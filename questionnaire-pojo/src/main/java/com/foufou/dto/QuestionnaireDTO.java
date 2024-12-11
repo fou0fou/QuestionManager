@@ -19,6 +19,10 @@ public class QuestionnaireDTO {
 
     private String title;
 
+    private String major;
+
+    private Integer grade;
+
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;

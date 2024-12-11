@@ -1,9 +1,11 @@
 package com.foufou.service;
 
 import com.foufou.dto.QuestionnaireDTO;
+import com.foufou.dto.StuDTO;
 import com.foufou.results.PageResult;
 import com.foufou.vo.QuestionnaireDetailVO;
 import com.foufou.vo.QuestionnaireVO;
+import com.foufou.vo.StuQuestionnaireDetailVO;
 
 public interface QuestionnaireService {
     void createPaper(QuestionnaireDTO questionnaireDTO);
@@ -17,4 +19,6 @@ public interface QuestionnaireService {
     QuestionnaireVO getPaper(Long id);
 
     QuestionnaireDetailVO getWholePaper(Long id);
+
+    StuQuestionnaireDetailVO getPaperToStu(Integer grade, String major);
 }

@@ -23,6 +23,10 @@ public class Questionnaire implements Serializable {
 
     private String title;
 
+    private String major;
+
+    private Integer grade;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

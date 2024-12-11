@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 public class QuestionnaireVO {
     private Long id;
 
+    private String major;
+
+    private Integer grade;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

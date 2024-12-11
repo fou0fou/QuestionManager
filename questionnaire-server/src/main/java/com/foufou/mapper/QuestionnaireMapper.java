@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -49,4 +50,16 @@ public interface QuestionnaireMapper {
     // 根据id回显问卷信息
     @Select("select * from questionnaire where id = #{id}")
     Questionnaire getPaperById(Long id);
+
+    // 添加次数
+    @Update("update questionnaire set fill_count = fill_count+1 where id = #{questionnaireId}")
+    void updateFillCount(Long questionnaireId);
+
+    // 根据年级和专业获取问卷
+    @Select("select * from questionnaire where grade = #{grade} and major = #{major};")
+    Questionnaire getPaperByGradeAndMajor(Integer grade, String major);
+
+    // 更新问卷状态
+    @Update("update questionnaire set status = #{status} where id = #{id}")
+    void updateStatus(Long id, Integer status);
 }

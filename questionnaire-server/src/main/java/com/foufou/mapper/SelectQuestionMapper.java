@@ -2,6 +2,7 @@ package com.foufou.mapper;
 
 import com.foufou.entity.Option;
 import com.foufou.entity.SelectInnerQuestion;
+import com.foufou.entity.SelectJointData;
 import com.foufou.entity.SelectQuestion;
 import org.apache.ibatis.annotations.*;
 
@@ -84,4 +85,8 @@ public interface SelectQuestionMapper {
 
     // 根据已有的嵌套id删除多余的
     void deleteExtraInnerQuestions(Long questionId, List<Long> selectInnerQuestionIds);
+
+    // 根据问卷id获取问题id和seqNum
+    @Select("select select_id, seq_num from questionnaire_select where questionnaire_id = #{id}")
+    List<SelectJointData> getIdAndSeqNumByQuestionnaireId(Long id);
 }

@@ -59,5 +59,16 @@
             #{id}
         </foreach>
     </select>
+    <select id="selectTableDataById" resultType="com.foufou.entity.TableContent">
+        select * from table_content
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="questionId != null">
+                and question_id = #{questionId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

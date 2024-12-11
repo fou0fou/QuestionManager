@@ -12,5 +12,9 @@ import java.util.List;
 public class SelectInnerAnswerDTO {
     private String questionDetails;
 
+    private List<String> optionContent;
+
+    private Double evaluationScore;
+
     private List<Integer> counts;
 }

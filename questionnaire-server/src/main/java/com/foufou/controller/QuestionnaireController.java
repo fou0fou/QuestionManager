@@ -1,11 +1,15 @@
 package com.foufou.controller;
 
+import com.foufou.constant.MessageConstant;
 import com.foufou.dto.QuestionnaireDTO;
+import com.foufou.dto.StuDTO;
+import com.foufou.exception.StuIdError;
 import com.foufou.results.PageResult;
 import com.foufou.results.Result;
 import com.foufou.service.QuestionnaireService;
 import com.foufou.vo.QuestionnaireDetailVO;
 import com.foufou.vo.QuestionnaireVO;
+import com.foufou.vo.StuQuestionnaireDetailVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -61,5 +65,16 @@ public class QuestionnaireController {
         log.info("根据id-{}查看整张问卷",id);
         QuestionnaireDetailVO questionnaireDetail = questionnaireService.getWholePaper(id);
         return Result.success(questionnaireDetail);
+    }
+
+    @GetMapping("/stu/getPaper")
+    public Result<StuQuestionnaireDetailVO> getPaperToStu(@RequestBody StuDTO stuDTO) {
+        if (stuDTO.getStuId().length() != 8) {
+            throw new StuIdError(MessageConstant.STU_ID_ERROR);
+        }
+        Integer grade = Integer.parseInt("20" + stuDTO.getStuId().substring(0, 2));
+
+        StuQuestionnaireDetailVO stuQuestionnaireDetailVO = questionnaireService.getPaperToStu(grade, stuDTO.getMajor());
+        return Result.success(stuQuestionnaireDetailVO);
     }
 }
