@@ -10,7 +10,9 @@ import com.foufou.vo.TableAnswerVO;
 import com.foufou.vo.TextAnswerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
+@Transactional
 public class AnswerServiceImpl implements AnswerService {
 
     @Autowired
@@ -64,6 +67,7 @@ public class AnswerServiceImpl implements AnswerService {
                             .textId(answerDTO.getQuestionId())
                             .questionnaireId(answerDTO.getQuestionnaireId())
                             .stuName(answerDTO.getStuName())
+                            .tableId(null)
                             .content(answerDTO.getAnswerContent().get(0).getAnswer())
                             .build();
                     textQuestionAnswerMapper.addTextAnswer(textAnswer);
@@ -279,10 +283,16 @@ public class AnswerServiceImpl implements AnswerService {
                             && optionContent.contains("很不满意")) {
                         double evaluation = 0.0;
                         if (counts.get(0) + counts.get(1) + counts.get(2) + counts.get(3) + counts.get(4) != 0) {
-                            evaluation = (double) (95 * counts.get(0) + 80 * counts.get(1) + 65 * counts.get(2) + 50 * counts.get(3) + 35 * counts.get(4))
+                            evaluation = (double) (0.95 * counts.get(0) + 0.80 * counts.get(1) + 0.65 * counts.get(2) + 0.50 * counts.get(3) + 0.35 * counts.get(4))
                                     / (counts.get(0) + counts.get(1) + counts.get(2) + counts.get(3) + counts.get(4));
                         }
-                        selectInnerAnswerDTO.setEvaluationScore(evaluation);
+                        /**
+                         * BigDecimal bd = new BigDecimal(value);
+                         *         bd = bd.setScale(3, BigDecimal.ROUND_HALF_UP); // 四舍五入
+                         *         double result = bd.doubleValue();
+                         */
+                        BigDecimal bd = new BigDecimal(evaluation);
+                        selectInnerAnswerDTO.setEvaluationScore(bd.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue());
                     } else {
                         selectInnerAnswerDTO.setEvaluationScore(null);
                     }
