@@ -1,4 +1,4 @@
-sky:
+foufou:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
@@ -6,6 +6,3 @@ sky:
     database: questionnaire
     username: root
     password: 68942569
-  alioss:
-    endpoint: https://oss-cn-hangzhou.aliyuncs.com
-    bucketName: foufoufiles

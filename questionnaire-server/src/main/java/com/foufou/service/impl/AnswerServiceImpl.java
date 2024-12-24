@@ -283,7 +283,7 @@ public class AnswerServiceImpl implements AnswerService {
                             && optionContent.contains("很不满意")) {
                         double evaluation = 0.0;
                         if (counts.get(0) + counts.get(1) + counts.get(2) + counts.get(3) + counts.get(4) != 0) {
-                            evaluation = (double) (0.95 * counts.get(0) + 0.80 * counts.get(1) + 0.65 * counts.get(2) + 0.50 * counts.get(3) + 0.35 * counts.get(4))
+                            evaluation = (0.95 * counts.get(0) + 0.80 * counts.get(1) + 0.65 * counts.get(2) + 0.50 * counts.get(3) + 0.35 * counts.get(4))
                                     / (counts.get(0) + counts.get(1) + counts.get(2) + counts.get(3) + counts.get(4));
                         }
                         /**

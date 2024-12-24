@@ -65,8 +65,13 @@ public class TextQuestionServiceImpl implements TextQuestionService {
         // 新建表结构
         List<Long> tableIds = new ArrayList<>();
         textQuestionDTO.getTableContentDTOList().forEach(tableContentDTO -> {
-            // 根据id查找是否存在该数据
-            TableContent tableContent = textQuestionMapper.selectTableDataById(tableContentDTO.getId(), textQuestion.getId());
+
+            TableContent tableContent = null;
+
+            if (null != tableContentDTO.getId()) {
+                // 根据id查找是否存在该数据
+                tableContent = textQuestionMapper.selectTableDataById(tableContentDTO.getId(), textQuestion.getId());
+            }
 
             if (null != tableContent) {     // 若存在，更新，并tableIds
                 TableContent ta = TableContent.builder()

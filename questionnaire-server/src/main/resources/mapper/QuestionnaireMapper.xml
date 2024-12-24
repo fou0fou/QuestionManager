@@ -18,12 +18,10 @@
             <if test="grade != null">grade = #{grade},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="startTime != null">start_time = #{startTime},</if>
-            <if test="endTime= null">end_time = #{endTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
             <if test="status != null">status = #{status},</if>
             <if test="description != null">description = #{description},</if>
             <if test="title != null">title = #{title},</if>
-            <if test="major != null">major = #{major}</if>
-            <if test="grade != null">grade = #{grade}</if>
         </set>
         where id = #{id}
     </update>

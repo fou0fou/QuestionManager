@@ -1,5 +1,7 @@
 server:
   port: 8080
+  jetty:
+    max-http-form-post-size: 200000B
 
 spring:
   profiles:
@@ -8,10 +10,10 @@ spring:
     allow-circular-references: true
   datasource:
     druid:
-      driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+      driver-class-name: ${foufou.datasource.driver-class-name}
+      url: jdbc:mysql://${foufou.datasource.host}:${foufou.datasource.port}/${foufou.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${foufou.datasource.username}
+      password: ${foufou.datasource.password}
   # 文件上传配置
   servlet:
     multipart:
